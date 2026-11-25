@@ -56,14 +56,14 @@ class AppState(val prefs: Prefs) {
 
     fun t(k: String) = S.t(k, lang)
 
-    fun setName(v: String) { if (v.isNotBlank()) { name = v.trim(); prefs.name = name } }
-    fun setExam(v: LocalDate) { exam = v; prefs.examDate = v }
-    fun setLang(v: String) { lang = v; prefs.lang = v }
-    fun setDark(v: Boolean) { dark = v; prefs.dark = v }
-    fun setCd(v: Boolean) { cdOn = v; prefs.countdownOn = v }
-    fun setMo(v: Boolean) { moOn = v; prefs.motivationOn = v }
-    fun setNight(v: Boolean) { nightOn = v; prefs.nightOn = v }
-    fun setInterval(v: Int) { interval = v; prefs.interval = v }
+    fun saveName(v: String) { if (v.isNotBlank()) { name = v.trim(); prefs.name = name } }
+    fun saveExam(v: LocalDate) { exam = v; prefs.examDate = v }
+    fun saveLang(v: String) { lang = v; prefs.lang = v }
+    fun saveDark(v: Boolean) { dark = v; prefs.dark = v }
+    fun saveCd(v: Boolean) { cdOn = v; prefs.countdownOn = v }
+    fun saveMo(v: Boolean) { moOn = v; prefs.motivationOn = v }
+    fun saveNight(v: Boolean) { nightOn = v; prefs.nightOn = v }
+    fun saveInterval(v: Int) { interval = v; prefs.interval = v }
 }
 
 @Composable
@@ -166,16 +166,16 @@ fun Setup(st: AppState, done: () -> Unit) {
         }
         Spacer(Modifier.height(20.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            FilterChip(selected = st.lang == "bn", onClick = { st.setLang("bn") }, label = { Text("বাংলা") })
-            FilterChip(selected = st.lang == "en", onClick = { st.setLang("en") }, label = { Text("English") })
+            FilterChip(selected = st.lang == "bn", onClick = { st.saveLang("bn") }, label = { Text("বাংলা") })
+            FilterChip(selected = st.lang == "en", onClick = { st.saveLang("en") }, label = { Text("English") })
         }
         Spacer(Modifier.height(20.dp))
         Button(
-            onClick = { st.setName(name); done() },
+            onClick = { st.saveName(name); done() },
             modifier = Modifier.fillMaxWidth().height(52.dp)
         ) { Text(st.t("start"), fontSize = 17.sp) }
     }
-    if (showDate) DateDialog(st.exam, st, { st.setExam(it) }, { showDate = false })
+    if (showDate) DateDialog(st.exam, st, { st.saveExam(it) }, { showDate = false })
 }
 
 @Composable
@@ -438,7 +438,7 @@ fun SettingsTab(st: AppState, db: NotesDb, onNotesChanged: () -> Unit) {
                 singleLine = true, modifier = Modifier.weight(1f)
             )
             Spacer(Modifier.width(8.dp))
-            Button(onClick = { st.setName(nameField) }) { Text(st.t("save")) }
+            Button(onClick = { st.saveName(nameField) }) { Text(st.t("save")) }
         }
 
         SectionTitle(st.t("examDate"))
@@ -453,16 +453,16 @@ fun SettingsTab(st: AppState, db: NotesDb, onNotesChanged: () -> Unit) {
             Button(onClick = { launcher.launch(Manifest.permission.POST_NOTIFICATIONS) }) { Text(st.t("allowNow")) }
             Spacer(Modifier.height(6.dp))
         }
-        SwitchRow(st.t("cdNotif"), st.cdOn) { st.setCd(it); Notifier.schedule(ctx) }
-        SwitchRow(st.t("moNotif"), st.moOn) { st.setMo(it); Notifier.schedule(ctx) }
-        SwitchRow(st.t("nightNotif"), st.nightOn) { st.setNight(it) }
+        SwitchRow(st.t("cdNotif"), st.cdOn) { st.saveCd(it); Notifier.schedule(ctx) }
+        SwitchRow(st.t("moNotif"), st.moOn) { st.saveMo(it); Notifier.schedule(ctx) }
+        SwitchRow(st.t("nightNotif"), st.nightOn) { st.saveNight(it) }
         Spacer(Modifier.height(6.dp))
         Text(st.t("interval"), fontSize = 15.sp)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf(1, 2, 3, 6).forEach { h ->
                 FilterChip(
                     selected = st.interval == h,
-                    onClick = { st.setInterval(h); Notifier.schedule(ctx) },
+                    onClick = { st.saveInterval(h); Notifier.schedule(ctx) },
                     label = { Text(num(h.toLong(), st.lang)) }
                 )
             }
@@ -480,11 +480,11 @@ fun SettingsTab(st: AppState, db: NotesDb, onNotesChanged: () -> Unit) {
 
         SectionTitle(st.t("language"))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            FilterChip(selected = st.lang == "bn", onClick = { st.setLang("bn") }, label = { Text("বাংলা") })
-            FilterChip(selected = st.lang == "en", onClick = { st.setLang("en") }, label = { Text("English") })
+            FilterChip(selected = st.lang == "bn", onClick = { st.saveLang("bn") }, label = { Text("বাংলা") })
+            FilterChip(selected = st.lang == "en", onClick = { st.saveLang("en") }, label = { Text("English") })
         }
         Spacer(Modifier.height(6.dp))
-        SwitchRow(st.t("dark"), st.dark) { st.setDark(it) }
+        SwitchRow(st.t("dark"), st.dark) { st.saveDark(it) }
 
         SectionTitle(st.t("about"))
         Text(st.t("aboutText"), fontSize = 14.sp)
@@ -500,7 +500,7 @@ fun SettingsTab(st: AppState, db: NotesDb, onNotesChanged: () -> Unit) {
         Spacer(Modifier.height(24.dp))
     }
 
-    if (showDate) DateDialog(st.exam, st, { st.setExam(it) }, { showDate = false })
+    if (showDate) DateDialog(st.exam, st, { st.saveExam(it) }, { showDate = false })
     if (confirmAll) {
         AlertDialog(
             onDismissRequest = { confirmAll = false },
