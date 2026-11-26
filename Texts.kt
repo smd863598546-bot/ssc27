@@ -30,6 +30,18 @@ fun fmtDateTime(ms: Long, lang: String): String {
     return fmtDate(dt.toLocalDate(), lang) + ", " + t
 }
 
+fun relTime(ms: Long, lang: String): String {
+    val mins = (System.currentTimeMillis() - ms) / 60000L
+    val hours = mins / 60L
+    val bn = lang == "bn"
+    return when {
+        mins < 1L -> if (bn) "এইমাত্র" else "Now"
+        mins < 60L -> if (bn) num(mins, lang) + " মিনিট আগে" else if (mins == 1L) "1 minute ago" else "$mins minutes ago"
+        hours < 24L -> if (bn) num(hours, lang) + " ঘণ্টা আগে" else if (hours == 1L) "1 hour ago" else "$hours hours ago"
+        else -> fmtDateTime(ms, lang)
+    }
+}
+
 object Texts {
     fun countdownLine(name: String, days: Long, exam: LocalDate, lang: String): String {
         val d = fmtDate(exam, lang)
